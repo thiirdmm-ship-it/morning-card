@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gửi Em Yêu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #fff0f3;
+            overflow: hidden;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .pink-gradient {
+            background: linear-gradient(180deg, #ffc2d1 0%, #ffe5ec 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 40px;
+            box-shadow: 0 15px 35px rgba(255, 158, 181, 0.4);
+            z-index: 10;
+        }
+
+        /* Hiệu ứng trôi nổi */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Nút bấm */
+        .btn-love {
+            background: linear-gradient(135deg, #ff758f 0%, #ff4d6d 100%);
+            box-shadow: 0 6px 20px rgba(255, 77, 109, 0.4);
+            border: none;
+            transition: transform 0.1s active;
+        }
+        .btn-love:active {
+            transform: scale(0.95);
+        }
+
+        /* Hiệu ứng trái tim bay (Mã nguồn tự trị) */
+        .heart-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+            animation: fly Up 1s ease-out forwards;
+        }
+        @keyframes flyUp {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        #loveMessage {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-center p-6 pink-gradient relative">
+
+    <!-- Trang trí nền -->
+    <div class="absolute top-10 left-5 opacity-30 floating">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="#ffb3c1"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </div>
+
+    <!-- Container chính -->
+    <div class="glass-card w-full max-w-sm flex flex-col items-center p-8 text-center">
+        <!-- Icon Mây -->
+        <div class="w-24 h-24 mb-4 floating">
+            <svg viewBox="0 0 100 100">
+                <path d="M25,60 Q15,60 15,50 Q15,40 25,40 Q25,20 45,20 Q55,20 60,30 Q75,30 75,45 Q75,60 60,60 Z" fill="#ffccd5" />
+                <circle cx="40" cy="45" r="2" fill="#ff4d6d" />
+                <circle cx="55" cy="45" r="2" fill="#ff4d6d" />
+                <path d="M42,52 Q47,56 52,52" fill="none" stroke="#ff4d6d" stroke-width="2" stroke-linecap="round" />
+            </svg>
+        </div>
+
+        <h1 class="text-2xl font-bold text-[#ff4d6d] mb-2">
+            Chào buổi sáng,<br>em yêu của anh! ❤️
+        </h1>
+        
+        <p class="text-[#ff758f] mb-6 text-sm italic">
+            Dậy thôi công chúa ơi, một ngày mới tuyệt vời đang chờ em đó.
+        </p>
+
+        <!-- NÚT BẤM - Đã sửa lỗi -->
+        <button id="loveBtn" class="btn-love text-white font-bold py-4 px-8 rounded-full text-lg mb-6 w-full uppercase tracking-wider">
+            Nhận yêu thương 🌸
+        </button>
+
+        <!-- Vùng hiển thị tin nhắn -->
+        <div id="loveMessage" class="min-h-[80px] flex items-center justify-center text-[#c9184a] font-bold text-base bg-[#fff5f7] rounded-2xl p-4 w-full border border-[#ffccd5] shadow-inner">
+            Bấm nút ở trên đi em...
+        </div>
+    </div>
+
+    <script>
+        const messages = [
+            "Em nhớ ăn sáng đầy đủ rồi đi làm nhé! ☕",
+            "Anh yêu em nhiều hơn ngày hôm qua! 💞",
+            "Hôm nay em chắc chắn là cô gái xinh đẹp nhất! ✨",
+            "Chúc công chúa của anh có một ngày suôn sẻ! 💪",
+            "Nụ cười của em là nắng của anh! ☀️",
+            "Tan làm nhắn anh, anh đón em đi ăn nhé! 🍜",
+            "Đừng làm việc quá sức nhé, anh thương lắm! 🥺",
+            "Cố lên em yêu, anh luôn ở bên em! 💌"
+        ];
+
+        const btn = document.getElementById('loveBtn');
+        const display = document.getElementById('loveMessage');
+
+        // Hàm tạo trái tim bay bằng mã thuần
+        function createHeart(x, y) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-particle';
+            heart.innerHTML = '❤️';
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+            
+            // Random hướng bay
+            const tx = (Math.random() - 0.5) * 200;
+            const ty = -100 - Math.random() * 150;
+            heart.style.setProperty('--tx', `${tx}px`);
+            heart.style.setProperty('--ty', `${ty}px`);
+            
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+
+        // Logic xử lý khi bấm
+        function triggerLove(e) {
+            // Ngăn chặn sự kiện bị lặp
+            if (e) e.preventDefault();
+
+            // 1. Hiện tin nhắn
+            const randomIdx = Math.floor(Math.random() * messages.length);
+            display.style.opacity = '0';
+            
+            setTimeout(() => {
+                display.innerText = messages[randomIdx];
+                display.style.opacity = '1';
+                display.style.transform = 'scale(1.05)';
+                setTimeout(() => display.style.transform = 'scale(1)', 200);
+            }, 100);
+
+            // 2. Hiệu ứng trái tim tại vị trí bấm hoặc giữa màn hình
+            const posX = e.clientX || (window.innerWidth / 2);
+            const posY = e.clientY || (window.innerHeight / 2);
+            
+            for(let i=0; i<15; i++) {
+                setTimeout(() => createHeart(posX, posY), i * 20);
+            }
+        }
+
+        // Gán sự kiện cực mạnh cho cả Mobile và Desktop
+        btn.onclick = triggerLove;
+        
+        // Đảm bảo không bị zoom/lag
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
